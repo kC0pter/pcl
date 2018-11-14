@@ -14,7 +14,9 @@ if(build)
         src/sift_keypoint.cpp
         src/smoothed_surfaces_keypoint.cpp
         src/harris_3d.cpp
+		src/harris_3d_custom.cpp
         src/harris_6d.cpp
+		src/harris_6d_custom.cpp
         src/agast_2d.cpp
         src/susan.cpp
         src/iss_3d.cpp
@@ -31,7 +33,9 @@ if(build)
         "include/pcl/${SUBSYS_NAME}/agast_2d.h"
         "include/pcl/${SUBSYS_NAME}/harris_2d.h"
         "include/pcl/${SUBSYS_NAME}/harris_3d.h"
+		"include/pcl/${SUBSYS_NAME}/harris_3d_custom.h"
         "include/pcl/${SUBSYS_NAME}/harris_6d.h"
+		"include/pcl/${SUBSYS_NAME}/harris_6d_custom.h"
         "include/pcl/${SUBSYS_NAME}/susan.h"
         "include/pcl/${SUBSYS_NAME}/iss_3d.h"
         "include/pcl/${SUBSYS_NAME}/brisk_2d.h"
@@ -45,7 +49,9 @@ if(build)
         "include/pcl/${SUBSYS_NAME}/impl/agast_2d.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/harris_2d.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/harris_3d.hpp"
+		"include/pcl/${SUBSYS_NAME}/impl/harris_3d_custom.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/harris_6d.hpp"
+		"include/pcl/${SUBSYS_NAME}/impl/harris_6d_custom.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/susan.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/iss_3d.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/brisk_2d.hpp"

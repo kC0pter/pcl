@@ -38,7 +38,7 @@
 #ifndef PCL_HARRIS_KEYPOINT_3D_CUSTOM_IMPL_H_
 #define PCL_HARRIS_KEYPOINT_3D_CUSTOM_IMPL_H_
 
-#include <pcl/keypoints/harris_3d_CUSTOM.h>
+#include <pcl/keypoints/harris_3d_custom.h>
 #include <pcl/common/io.h>
 #include <pcl/filters/passthrough.h>
 #include <pcl/filters/extract_indices.h>

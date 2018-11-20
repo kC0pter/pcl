@@ -12,6 +12,7 @@ if(build)
     set(srcs
         src/search.cpp
         src/kdtree.cpp
+		src/kdtree_custom.cpp
         src/brute_force.cpp
         src/organized.cpp
         src/octree.cpp
@@ -20,6 +21,7 @@ if(build)
     set(incs
         "include/pcl/${SUBSYS_NAME}/search.h"
         "include/pcl/${SUBSYS_NAME}/kdtree.h"
+		"include/pcl/${SUBSYS_NAME}/kdtree_custom.h"
         "include/pcl/${SUBSYS_NAME}/brute_force.h"
         "include/pcl/${SUBSYS_NAME}/organized.h"
         "include/pcl/${SUBSYS_NAME}/octree.h"
@@ -30,6 +32,7 @@ if(build)
     set(impl_incs
         "include/pcl/${SUBSYS_NAME}/impl/search.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/kdtree.hpp"
+		"include/pcl/${SUBSYS_NAME}/impl/kdtree_custom.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/flann_search.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/brute_force.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/organized.hpp"

@@ -5,7 +5,7 @@
 
 #include <pcl/io/pcd_io.h>
 #include <pcl/conversions.h>
-#include <pcl/filters/uniform_sampling.h>
+#include <pcl/keypoints/harris_3d_custom.h>
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/features/fpfh_omp.h>
 #include <pcl/registration/correspondence_estimation.h>
@@ -20,23 +20,32 @@ using namespace pcl::registration;
 PointCloud<PointXYZ>::Ptr src, tgt;
 
 ////////////////////////////////////////////////////////////////////////////////
-void
-estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
+void estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
 	const PointCloud<PointXYZ>::Ptr &tgt,
 	PointCloud<PointXYZ> &keypoints_src,
 	PointCloud<PointXYZ> &keypoints_tgt)
 {
+	HarrisKeypoint3DCustom<PointXYZ, PointXYZ> keypoints_est;
+	NormalEstimationOMP<PointXYZ, Normal> normal_est;
+	PointCloud<Normal>::Ptr normals_ptr(new PointCloud<Normal>);
 
+	normal_est.setInputCloud(src);
+	normal_est.setRadiusSearch(0.5);
+	normal_est.compute(*normals_ptr);
 
-	// Get an uniform grid of keypoints
-	UniformSampling<PointXYZ> uniform;
-	uniform.setRadiusSearch(1);  // 1m
+	keypoints_est.setInputCloud(src);
+	keypoints_est.setRadiusSearch(1);
+	keypoints_est.setNormals(normals_ptr);
+	keypoints_est.compute(keypoints_src);
 
-	uniform.setInputCloud(src);
-	uniform.filter(keypoints_src);
+	normal_est.setInputCloud(tgt);
+	normal_est.setRadiusSearch(0.5);
+	normal_est.compute(*normals_ptr);
 
-	uniform.setInputCloud(tgt);
-	uniform.filter(keypoints_tgt);
+	keypoints_est.setInputCloud(tgt);
+	keypoints_est.setRadiusSearch(1);
+	keypoints_est.setNormals(normals_ptr);
+	keypoints_est.compute(keypoints_tgt);
 
 	// For debugging purposes only: uncomment the lines below and use pcl_viewer to view the results, i.e.:
 	// pcl_viewer source_pcd keypoints_src.pcd -ps 1 -ps 10
@@ -45,8 +54,7 @@ estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void
-estimateNormals(const PointCloud<PointXYZ>::Ptr &src,
+void estimateNormals(const PointCloud<PointXYZ>::Ptr &src,
 	const PointCloud<PointXYZ>::Ptr &tgt,
 	PointCloud<Normal> &normals_src,
 	PointCloud<Normal> &normals_tgt)
@@ -61,6 +69,7 @@ estimateNormals(const PointCloud<PointXYZ>::Ptr &src,
 
 	// For debugging purposes only: uncomment the lines below and use pcl_viewer to view the results, i.e.:
 	// pcl_viewer normals_src.pcd
+	/*
 	PointCloud<PointNormal> s, t;
 	copyPointCloud<PointXYZ, PointNormal>(*src, s);
 	copyPointCloud<Normal, PointNormal>(normals_src, s);
@@ -68,11 +77,11 @@ estimateNormals(const PointCloud<PointXYZ>::Ptr &src,
 	copyPointCloud<Normal, PointNormal>(normals_tgt, t);
 	savePCDFileBinary("normals_src.pcd", s);
 	savePCDFileBinary("normals_tgt.pcd", t);
+	*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void
-estimateFPFH(const PointCloud<PointXYZ>::Ptr &src,
+void estimateFPFH(const PointCloud<PointXYZ>::Ptr &src,
 	const PointCloud<PointXYZ>::Ptr &tgt,
 	const PointCloud<Normal>::Ptr &normals_src,
 	const PointCloud<Normal>::Ptr &normals_tgt,
@@ -103,8 +112,7 @@ estimateFPFH(const PointCloud<PointXYZ>::Ptr &src,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void
-findCorrespondences(const PointCloud<FPFHSignature33>::Ptr &fpfhs_src,
+void findCorrespondences(const PointCloud<FPFHSignature33>::Ptr &fpfhs_src,
 	const PointCloud<FPFHSignature33>::Ptr &fpfhs_tgt,
 	Correspondences &all_correspondences)
 {
@@ -131,8 +139,7 @@ rejectBadCorrespondences(const CorrespondencesPtr &all_correspondences,
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void
-computeTransformation(const PointCloud<PointXYZ>::Ptr &src,
+void computeTransformation(const PointCloud<PointXYZ>::Ptr &src,
 	const PointCloud<PointXYZ>::Ptr &tgt,
 	Eigen::Matrix4f &transform)
 {
@@ -177,8 +184,7 @@ computeTransformation(const PointCloud<PointXYZ>::Ptr &src,
 }
 
 /* ---[ */
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	// Parse the command line arguments for .pcd files
 	std::vector<int> p_file_indices;

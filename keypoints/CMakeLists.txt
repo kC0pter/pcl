@@ -19,6 +19,7 @@ if(build)
 		src/harris_6d_custom.cpp
         src/agast_2d.cpp
         src/susan.cpp
+		src/susan_custom_omp.cpp
         src/iss_3d.cpp
         src/brisk_2d.cpp
         src/trajkovic_2d.cpp
@@ -37,6 +38,7 @@ if(build)
         "include/pcl/${SUBSYS_NAME}/harris_6d.h"
 		"include/pcl/${SUBSYS_NAME}/harris_6d_custom.h"
         "include/pcl/${SUBSYS_NAME}/susan.h"
+		"include/pcl/${SUBSYS_NAME}/susan_custom_omp.h"
         "include/pcl/${SUBSYS_NAME}/iss_3d.h"
         "include/pcl/${SUBSYS_NAME}/brisk_2d.h"
         "include/pcl/${SUBSYS_NAME}/trajkovic_2d.h"
@@ -53,6 +55,7 @@ if(build)
         "include/pcl/${SUBSYS_NAME}/impl/harris_6d.hpp"
 		"include/pcl/${SUBSYS_NAME}/impl/harris_6d_custom.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/susan.hpp"
+		"include/pcl/${SUBSYS_NAME}/impl/susan_custom_omp.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/iss_3d.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/brisk_2d.hpp"
         "include/pcl/${SUBSYS_NAME}/impl/trajkovic_2d.hpp"

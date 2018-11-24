@@ -36,15 +36,15 @@
  * $Id$
  */
 
-#ifndef PCL_SUSAN_KEYPOINT_H_
-#define PCL_SUSAN_KEYPOINT_H_
+#ifndef PCL_SUSAN_KEYPOINT_CUSTOM_OMP_H_
+#define PCL_SUSAN_KEYPOINT_CUSTOM_OMP_H_
 
 #include <pcl/keypoints/keypoint.h>
 #include <pcl/common/intensity.h>
 
 namespace pcl
 {
-  /** \brief SUSANKeypoint implements a RGB-D extension of the SUSAN detector including normal 
+  /** \brief SUSANKeypointCustomOMP implements a RGB-D extension of the SUSAN detector including normal 
     * directions variation in top of intensity variation. 
     * It is different from Harris in that it exploits normals directly so it is faster.  
     * Original paper "SUSAN — A New Approach to Low Level Image Processing", Smith,
@@ -54,11 +54,11 @@ namespace pcl
     * \ingroup keypoints
     */
   template <typename PointInT, typename PointOutT, typename NormalT = pcl::Normal, typename IntensityT= pcl::common::IntensityFieldAccessor<PointInT> >
-  class SUSANKeypoint : public Keypoint<PointInT, PointOutT>
+  class SUSANKeypointCustomOMP : public Keypoint<PointInT, PointOutT>
   {
     public:
-      typedef boost::shared_ptr<SUSANKeypoint<PointInT, PointOutT, NormalT, IntensityT> > Ptr;
-      typedef boost::shared_ptr<const SUSANKeypoint<PointInT, PointOutT, NormalT, Intensity> > ConstPtr;
+      typedef boost::shared_ptr<SUSANKeypointCustomOMP<PointInT, PointOutT, NormalT, IntensityT> > Ptr;
+      typedef boost::shared_ptr<const SUSANKeypointCustomOMP<PointInT, PointOutT, NormalT, Intensity> > ConstPtr;
 
       typedef typename Keypoint<PointInT, PointOutT>::PointCloudIn PointCloudIn;
       typedef typename Keypoint<PointInT, PointOutT>::PointCloudOut PointCloudOut;
@@ -86,7 +86,7 @@ namespace pcl
         * \param[in] angular_threshold to test if normals are parallel
         * \param[in] intensity_threshold to test if points are of same color
         */
-      SUSANKeypoint (float radius = 0.01f, 
+      SUSANKeypointCustomOMP (float radius = 0.01f, 
                      float distance_threshold = 0.001f, 
                      float angular_threshold = 0.0001f, 
                      float intensity_threshold = 7.0f)
@@ -98,14 +98,14 @@ namespace pcl
         , label_idx_ (-1)
         , out_fields_ ()
       {
-        name_ = "SUSANKeypoint";
+        name_ = "SUSANKeypointCustomOMP";
         search_radius_ = radius;
         geometric_validation_ = false;
         tolerance_ = 2 * distance_threshold_;
       }
       
       /** \brief Empty destructor */
-      virtual ~SUSANKeypoint () {}
+      virtual ~SUSANKeypointCustomOMP () {}
 
       /** \brief set the radius for normal estimation and non maxima supression.
         * \param[in] radius
@@ -199,6 +199,6 @@ namespace pcl
   };
 }
 
-#include <pcl/keypoints/impl/susan.hpp>
+#include <pcl/keypoints/impl/susan_custom_omp.hpp>
 
-#endif // #ifndef PCL_SUSAN_KEYPOINT_H_
+#endif // #ifndef PCL_SUSAN_KEYPOINT_CUSTOM_OMP_H_

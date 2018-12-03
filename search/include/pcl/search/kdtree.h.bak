@@ -58,7 +58,7 @@ namespace pcl
       * \author Radu B. Rusu
       * \ingroup search
       */
-    template<typename PointT, class Tree = pcl::KdTreeFLANNCustom<PointT> >
+    template<typename PointT, class Tree = pcl::KdTreeFLANN<PointT> >
     class KdTree: public Search<PointT>
     {
       public:
@@ -172,8 +172,8 @@ namespace pcl
                       std::vector<float> &k_sqr_distances,
                       unsigned int max_nn = 0) const;
       protected:
-			/** \brief A pointer to the internal KdTreeCustom object. */
-			KdTreePtr tree_;
+        /** \brief A pointer to the internal KdTree object. */
+        KdTreePtr tree_;
     };
   }
 }

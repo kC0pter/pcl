@@ -41,65 +41,73 @@
 #include <pcl/search/kdtree_custom.h>
 #include <pcl/search/impl/search.hpp>
 
+ ///////////////////////////////////////////////////////////////////////////////////////////
+template <typename PointT, class Tree>
+pcl::search::KdTreeCustom<PointT, Tree>::KdTreeCustom(bool sorted)
+	: pcl::search::Search<PointT>("KdTreeCustom", sorted)
+	, tree_(new Tree(sorted))
+{
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 template <typename PointT, class Tree>
-pcl::search::KdTreeCustom<PointT,Tree>::KdTreeCustom (bool sorted)
-  : pcl::search::Search<PointT> ("KdTreeCustom", sorted)
-  , tree_ (new Tree (sorted))
+void pcl::search::KdTreeCustom<PointT, Tree>::setPointRepresentation(
+	const PointRepresentationConstPtr &point_representation)
 {
+	tree_->setPointRepresentation(point_representation);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-template <typename PointT, class Tree> void
-pcl::search::KdTreeCustom<PointT,Tree>::setPointRepresentation (
-    const PointRepresentationConstPtr &point_representation)
+template <typename PointT, class Tree>
+void pcl::search::KdTreeCustom<PointT, Tree>::setSortedResults(bool sorted_results)
 {
-  tree_->setPointRepresentation (point_representation);
+	sorted_results_ = sorted_results;
+	tree_->setSortedResults(sorted_results);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-template <typename PointT, class Tree> void
-pcl::search::KdTreeCustom<PointT,Tree>::setSortedResults (bool sorted_results)
+template <typename PointT, class Tree>
+void pcl::search::KdTreeCustom<PointT, Tree>::setEpsilon(float eps)
 {
-  sorted_results_ = sorted_results;
-  tree_->setSortedResults (sorted_results);
+	tree_->setEpsilon(eps);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-template <typename PointT, class Tree> void
-pcl::search::KdTreeCustom<PointT,Tree>::setEpsilon (float eps)
+template <typename PointT, class Tree>
+void pcl::search::KdTreeCustom<PointT, Tree>::setInputCloud(
+	const PointCloudConstPtr& cloud,
+	const IndicesConstPtr& indices)
 {
-  tree_->setEpsilon (eps);
+	tree_->setInputCloud(cloud, indices);
+	input_ = cloud;
+	indices_ = indices;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-template <typename PointT, class Tree> void
-pcl::search::KdTreeCustom<PointT,Tree>::setInputCloud (
-    const PointCloudConstPtr& cloud, 
-    const IndicesConstPtr& indices)
+template <typename PointT, class Tree>
+void pcl::search::KdTreeCustom<PointT, Tree>::setNumCores(int num_cores)
 {
-  tree_->setInputCloud (cloud, indices);
-  input_ = cloud;
-  indices_ = indices;
+	tree_->setParamKCores(num_cores);
+	tree_->setParamRadiusCores(num_cores);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-template <typename PointT, class Tree> int
-pcl::search::KdTreeCustom<PointT,Tree>::nearestKSearch (
-    const PointT &point, int k, std::vector<int> &k_indices, 
-    std::vector<float> &k_sqr_distances) const
+template <typename PointT, class Tree>
+int pcl::search::KdTreeCustom<PointT, Tree>::nearestKSearch(
+	const PointT &point, int k, std::vector<int> &k_indices,
+	std::vector<float> &k_sqr_distances) const
 {
-  return (tree_->nearestKSearch (point, k, k_indices, k_sqr_distances));
+	return (tree_->nearestKSearch(point, k, k_indices, k_sqr_distances));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-template <typename PointT, class Tree> int
-pcl::search::KdTreeCustom<PointT,Tree>::radiusSearch (
-    const PointT& point, double radius, 
-    std::vector<int> &k_indices, std::vector<float> &k_sqr_distances,
-    unsigned int max_nn) const
+template <typename PointT, class Tree>
+int pcl::search::KdTreeCustom<PointT, Tree>::radiusSearch(
+	const PointT& point, double radius,
+	std::vector<int> &k_indices, std::vector<float> &k_sqr_distances,
+	unsigned int max_nn) const
 {
-  return (tree_->radiusSearch (point, radius, k_indices, k_sqr_distances, max_nn));
+	return (tree_->radiusSearch(point, radius, k_indices, k_sqr_distances, max_nn));
 }
 
 #define PCL_INSTANTIATE_KdTreeCustom(T) template class PCL_EXPORTS pcl::search::KdTreeCustom<T>;

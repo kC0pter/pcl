@@ -45,129 +45,132 @@
 
 namespace pcl
 {
-	// Forward declarations
-	template <typename T> class PointRepresentation;
+  // Forward declarations
+  template <typename T> class PointRepresentation;
 
-	namespace search
-	{
-		/** \brief @b search::KdTreeCustom is a wrapper class which inherits the pcl::KdTreeCustom class for performing search
-		  * functions using KdTreeCustom structure. KdTreeCustom is a generic type of 3D spatial locator using kD-tree structures.
-		  * The class is making use of the FLANN (Fast Library for Approximate Nearest Neighbor) project
-		  * by Marius Muja and David Lowe.
-		  *
-		  * \author Radu B. Rusu
-		  * \ingroup search
-		  */
-		template<typename PointT, class Tree = pcl::KdTreeFLANNCustom<PointT> >
-		class KdTreeCustom : public Search<PointT>
-		{
-		public:
-			typedef typename Search<PointT>::PointCloud PointCloud;
-			typedef typename Search<PointT>::PointCloudConstPtr PointCloudConstPtr;
+  namespace search
+  {
+    /** \brief @b search::KdTreeCustom is a wrapper class which inherits the pcl::KdTreeCustom class for performing search 
+      * functions using KdTreeCustom structure. KdTreeCustom is a generic type of 3D spatial locator using kD-tree structures. 
+      * The class is making use of the FLANN (Fast Library for Approximate Nearest Neighbor) project 
+      * by Marius Muja and David Lowe.
+      *
+      * \author Radu B. Rusu
+      * \ingroup search
+      */
+    template<typename PointT, class Tree = pcl::KdTreeFLANNCustom<PointT> >
+    class KdTreeCustom: public Search<PointT>
+    {
+      public:
+        typedef typename Search<PointT>::PointCloud PointCloud;
+        typedef typename Search<PointT>::PointCloudConstPtr PointCloudConstPtr;
 
-			typedef boost::shared_ptr<std::vector<int> > IndicesPtr;
-			typedef boost::shared_ptr<const std::vector<int> > IndicesConstPtr;
+        typedef boost::shared_ptr<std::vector<int> > IndicesPtr;
+        typedef boost::shared_ptr<const std::vector<int> > IndicesConstPtr;
 
-			using pcl::search::Search<PointT>::indices_;
-			using pcl::search::Search<PointT>::input_;
-			using pcl::search::Search<PointT>::getIndices;
-			using pcl::search::Search<PointT>::getInputCloud;
-			using pcl::search::Search<PointT>::nearestKSearch;
-			using pcl::search::Search<PointT>::radiusSearch;
-			using pcl::search::Search<PointT>::sorted_results_;
+        using pcl::search::Search<PointT>::indices_;
+        using pcl::search::Search<PointT>::input_;
+        using pcl::search::Search<PointT>::getIndices;
+        using pcl::search::Search<PointT>::getInputCloud;
+        using pcl::search::Search<PointT>::nearestKSearch;
+        using pcl::search::Search<PointT>::radiusSearch;
+        using pcl::search::Search<PointT>::sorted_results_;
 
-			typedef boost::shared_ptr<KdTreeCustom<PointT, Tree> > Ptr;
-			typedef boost::shared_ptr<const KdTreeCustom<PointT, Tree> > ConstPtr;
+        typedef boost::shared_ptr<KdTreeCustom<PointT, Tree> > Ptr;
+        typedef boost::shared_ptr<const KdTreeCustom<PointT, Tree> > ConstPtr;
 
-			typedef boost::shared_ptr<Tree> KdTreeCustomPtr;
-			typedef boost::shared_ptr<const Tree> KdTreeCustomConstPtr;
-			typedef boost::shared_ptr<const PointRepresentation<PointT> > PointRepresentationConstPtr;
+        typedef boost::shared_ptr<Tree> KdTreeCustomPtr;
+        typedef boost::shared_ptr<const Tree> KdTreeCustomConstPtr;
+        typedef boost::shared_ptr<const PointRepresentation<PointT> > PointRepresentationConstPtr;
 
-			/** \brief Constructor for KdTreeCustom.
-			  *
-			  * \param[in] sorted set to true if the nearest neighbor search results
-			  * need to be sorted in ascending order based on their distance to the
-			  * query point
-			  *
-			  */
-			KdTreeCustom(bool sorted = true);
+        /** \brief Constructor for KdTreeCustom. 
+          *
+          * \param[in] sorted set to true if the nearest neighbor search results
+          * need to be sorted in ascending order based on their distance to the
+          * query point
+          *
+          */
+        KdTreeCustom (bool sorted = true); 
 
-			/** \brief Destructor for KdTreeCustom. */
-			virtual ~KdTreeCustom()
-			{
-			}
+        /** \brief Destructor for KdTreeCustom. */
+        virtual
+        ~KdTreeCustom ()
+        {
+        }
 
-			/** \brief Provide a pointer to the point representation to use to convert points into k-D vectors.
-			  * \param[in] point_representation the const boost shared pointer to a PointRepresentation
-			  */
-			void setPointRepresentation(const PointRepresentationConstPtr &point_representation);
+        /** \brief Provide a pointer to the point representation to use to convert points into k-D vectors. 
+          * \param[in] point_representation the const boost shared pointer to a PointRepresentation
+          */
+        void
+        setPointRepresentation (const PointRepresentationConstPtr &point_representation);
 
-			/** \brief Get a pointer to the point representation used when converting points into k-D vectors. */
-			inline PointRepresentationConstPtr getPointRepresentation() const
-			{
-				return (tree_->getPointRepresentation());
-			}
+        /** \brief Get a pointer to the point representation used when converting points into k-D vectors. */
+        inline PointRepresentationConstPtr
+        getPointRepresentation () const
+        {
+          return (tree_->getPointRepresentation ());
+        }
 
-			/** \brief Sets whether the results have to be sorted or not.
-			  * \param[in] sorted_results set to true if the radius search results should be sorted
-			  */
-			void setSortedResults(bool sorted_results);
+        /** \brief Sets whether the results have to be sorted or not.
+          * \param[in] sorted_results set to true if the radius search results should be sorted
+          */
+        void 
+        setSortedResults (bool sorted_results);
+        
+        /** \brief Set the search epsilon precision (error bound) for nearest neighbors searches.
+          * \param[in] eps precision (error bound) for nearest neighbors searches
+          */
+        void
+        setEpsilon (float eps);
 
-			/** \brief Set the search epsilon precision (error bound) for nearest neighbors searches.
-			  * \param[in] eps precision (error bound) for nearest neighbors searches
-			  */
-			void setEpsilon(float eps);
+        /** \brief Get the search epsilon precision (error bound) for nearest neighbors searches. */
+        inline float
+        getEpsilon () const
+        {
+          return (tree_->getEpsilon ());
+        }
 
-			/** \brief Get the search epsilon precision (error bound) for nearest neighbors searches. */
-			inline float getEpsilon() const
-			{
-				return (tree_->getEpsilon());
-			}
+        /** \brief Provide a pointer to the input dataset.
+          * \param[in] cloud the const boost shared pointer to a PointCloud message
+          * \param[in] indices the point indices subset that is to be used from \a cloud 
+          */
+        void
+        setInputCloud (const PointCloudConstPtr& cloud, 
+                       const IndicesConstPtr& indices = IndicesConstPtr ());
 
-			/** \brief Provide a pointer to the input dataset.
-			  * \param[in] cloud the const boost shared pointer to a PointCloud message
-			  * \param[in] indices the point indices subset that is to be used from \a cloud
-			  */
-			void setInputCloud(const PointCloudConstPtr& cloud,
-				const IndicesConstPtr& indices = IndicesConstPtr());
+        /** \brief Search for the k-nearest neighbors for the given query point.
+          * \param[in] point the given query point
+          * \param[in] k the number of neighbors to search for
+          * \param[out] k_indices the resultant indices of the neighboring points (must be resized to \a k a priori!)
+          * \param[out] k_sqr_distances the resultant squared distances to the neighboring points (must be resized to \a k
+          * a priori!)
+          * \return number of neighbors found
+          */
+        int
+        nearestKSearch (const PointT &point, int k, 
+                        std::vector<int> &k_indices, 
+                        std::vector<float> &k_sqr_distances) const;
 
-			/** \brief Provide a pointer to the input dataset.
-			  * \param[in] cloud the const boost shared pointer to a PointCloud message
-			  * \param[in] indices the point indices subset that is to be used from \a cloud
-			  */
-			void setNumCores(int num_cores);
-
-			/** \brief Search for the k-nearest neighbors for the given query point.
-			  * \param[in] point the given query point
-			  * \param[in] k the number of neighbors to search for
-			  * \param[out] k_indices the resultant indices of the neighboring points (must be resized to \a k a priori!)
-			  * \param[out] k_sqr_distances the resultant squared distances to the neighboring points (must be resized to \a k
-			  * a priori!)
-			  * \return number of neighbors found
-			  */
-			int nearestKSearch(const PointT &point, int k,
-				std::vector<int> &k_indices,
-				std::vector<float> &k_sqr_distances) const;
-
-			/** \brief Search for all the nearest neighbors of the query point in a given radius.
-			  * \param[in] point the given query point
-			  * \param[in] radius the radius of the sphere bounding all of p_q's neighbors
-			  * \param[out] k_indices the resultant indices of the neighboring points
-			  * \param[out] k_sqr_distances the resultant squared distances to the neighboring points
-			  * \param[in] max_nn if given, bounds the maximum returned neighbors to this value. If \a max_nn is set to
-			  * 0 or to a number higher than the number of points in the input cloud, all neighbors in \a radius will be
-			  * returned.
-			  * \return number of neighbors found in radius
-			  */
-			int radiusSearch(const PointT& point, double radius,
-				std::vector<int> &k_indices,
-				std::vector<float> &k_sqr_distances,
-				unsigned int max_nn = 0) const;
-		protected:
-			/** \brief A pointer to the internal KdTreeCustom object. */
-			KdTreeCustomPtr tree_;
-		};
-	}
+        /** \brief Search for all the nearest neighbors of the query point in a given radius.
+          * \param[in] point the given query point
+          * \param[in] radius the radius of the sphere bounding all of p_q's neighbors
+          * \param[out] k_indices the resultant indices of the neighboring points
+          * \param[out] k_sqr_distances the resultant squared distances to the neighboring points
+          * \param[in] max_nn if given, bounds the maximum returned neighbors to this value. If \a max_nn is set to
+          * 0 or to a number higher than the number of points in the input cloud, all neighbors in \a radius will be
+          * returned.
+          * \return number of neighbors found in radius
+          */
+        int
+        radiusSearch (const PointT& point, double radius, 
+                      std::vector<int> &k_indices, 
+                      std::vector<float> &k_sqr_distances,
+                      unsigned int max_nn = 0) const;
+      protected:
+        /** \brief A pointer to the internal KdTreeCustom object. */
+        KdTreeCustomPtr tree_;
+    };
+  }
 }
 
 #ifdef PCL_NO_PRECOMPILE

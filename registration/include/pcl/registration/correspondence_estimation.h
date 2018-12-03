@@ -72,10 +72,10 @@ namespace pcl
         using PCLBase<PointSource>::indices_;
         using PCLBase<PointSource>::setIndices;
 
-        typedef pcl::search::KdTreeCustom<PointTarget> KdTree;
+        typedef pcl::search::KdTree<PointTarget> KdTree;
         typedef typename KdTree::Ptr KdTreePtr;
 
-        typedef pcl::search::KdTreeCustom<PointSource> KdTreeReciprocal;
+        typedef pcl::search::KdTree<PointSource> KdTreeReciprocal;
         typedef typename KdTree::Ptr KdTreeReciprocalPtr;
 
         typedef pcl::PointCloud<PointSource> PointCloudSource;

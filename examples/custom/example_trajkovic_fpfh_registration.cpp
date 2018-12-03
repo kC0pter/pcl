@@ -5,7 +5,7 @@
 
 #include <pcl/io/pcd_io.h>
 #include <pcl/conversions.h>
-#include <pcl/keypoints/harris_3d_custom.h>
+#include <pcl/keypoints/trajkovic_3d.h>
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/features/fpfh_omp.h>
 #include <pcl/registration/correspondence_estimation.h>
@@ -25,7 +25,7 @@ void estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
 	PointCloud<PointXYZ> &keypoints_src,
 	PointCloud<PointXYZ> &keypoints_tgt)
 {
-	HarrisKeypoint3DCustom<PointXYZ, PointXYZ> keypoints_est;
+	TrajkovicKeypoint3D<PointXYZ, PointXYZ> keypoints_est;
 	NormalEstimationOMP<PointXYZ, Normal> normal_est;
 	PointCloud<Normal>::Ptr normals_ptr(new PointCloud<Normal>);
 

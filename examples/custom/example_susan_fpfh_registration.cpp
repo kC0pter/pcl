@@ -119,6 +119,8 @@ void findCorrespondences(const PointCloud<FPFHSignature33>::Ptr &fpfhs_src,
 	CorrespondenceEstimation<FPFHSignature33, FPFHSignature33> est;
 	est.setInputCloud(fpfhs_src);
 	est.setInputTarget(fpfhs_tgt);
+	est.getSearchMethodSource()->setNumCores(0);
+	est.getSearchMethodTarget()->setNumCores(0);
 	est.determineReciprocalCorrespondences(all_correspondences);
 }
 

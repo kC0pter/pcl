@@ -5,7 +5,7 @@
 
 #include <pcl/io/pcd_io.h>
 #include <pcl/conversions.h>
-#include <pcl/keypoints/harris_3d_custom.h>
+#include <pcl/keypoints/harris_3d.h>
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/features/fpfh_omp.h>
 #include <pcl/registration/correspondence_estimation.h>
@@ -22,10 +22,10 @@ PointCloud<PointXYZ>::Ptr src, tgt;
 ////////////////////////////////////////////////////////////////////////////////
 void estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
 	const PointCloud<PointXYZ>::Ptr &tgt,
-	PointCloud<PointXYZ> &keypoints_src,
-	PointCloud<PointXYZ> &keypoints_tgt)
+	PointCloud<PointXYZI> &keypoints_src,
+	PointCloud<PointXYZI> &keypoints_tgt)
 {
-	HarrisKeypoint3DCustom<PointXYZ, PointXYZ> keypoints_est;
+	HarrisKeypoint3D<PointXYZ, PointXYZI> keypoints_est;
 	NormalEstimationOMP<PointXYZ, Normal> normal_est;
 	PointCloud<Normal>::Ptr normals_ptr(new PointCloud<Normal>);
 
@@ -71,9 +71,9 @@ void estimateNormals(const PointCloud<PointXYZ>::Ptr &src,
 	// pcl_viewer normals_src.pcd
 	/*
 	PointCloud<PointNormal> s, t;
-	copyPointCloud<PointXYZ, PointNormal>(*src, s);
+	copyPointCloud<PointXYZI, PointNormal>(*src, s);
 	copyPointCloud<Normal, PointNormal>(normals_src, s);
-	copyPointCloud<PointXYZ, PointNormal>(*tgt, t);
+	copyPointCloud<PointXYZI, PointNormal>(*tgt, t);
 	copyPointCloud<Normal, PointNormal>(normals_tgt, t);
 	savePCDFileBinary("normals_src.pcd", s);
 	savePCDFileBinary("normals_tgt.pcd", t);
@@ -85,21 +85,26 @@ void estimateFPFH(const PointCloud<PointXYZ>::Ptr &src,
 	const PointCloud<PointXYZ>::Ptr &tgt,
 	const PointCloud<Normal>::Ptr &normals_src,
 	const PointCloud<Normal>::Ptr &normals_tgt,
-	const PointCloud<PointXYZ>::Ptr &keypoints_src,
-	const PointCloud<PointXYZ>::Ptr &keypoints_tgt,
+	const PointCloud<PointXYZI>::Ptr &keypoints_src,
+	const PointCloud<PointXYZI>::Ptr &keypoints_tgt,
 	PointCloud<FPFHSignature33> &fpfhs_src,
 	PointCloud<FPFHSignature33> &fpfhs_tgt)
 {
-	FPFHEstimationOMP<PointXYZ, Normal, FPFHSignature33> fpfh_est;
+	FPFHEstimationOMP<PointXYZI, Normal, FPFHSignature33> fpfh_est;
+	PointCloud<PointXYZI>::Ptr src_i(new PointCloud<PointXYZI>);
+	PointCloud<PointXYZI>::Ptr tgt_i(new PointCloud<PointXYZI>);
+	copyPointCloud(*src, *src_i);
+	copyPointCloud(*tgt, *tgt_i);
+
 	fpfh_est.setInputCloud(keypoints_src);
 	fpfh_est.setInputNormals(normals_src);
 	fpfh_est.setRadiusSearch(1); // 1m
-	fpfh_est.setSearchSurface(src);
+	fpfh_est.setSearchSurface(src_i);
 	fpfh_est.compute(fpfhs_src);
 
 	fpfh_est.setInputCloud(keypoints_tgt);
 	fpfh_est.setInputNormals(normals_tgt);
-	fpfh_est.setSearchSurface(tgt);
+	fpfh_est.setSearchSurface(tgt_i);
 	fpfh_est.compute(fpfhs_tgt);
 
 	// For debugging purposes only: uncomment the lines below and use pcl_viewer to view the results, i.e.:
@@ -119,19 +124,21 @@ void findCorrespondences(const PointCloud<FPFHSignature33>::Ptr &fpfhs_src,
 	CorrespondenceEstimation<FPFHSignature33, FPFHSignature33> est;
 	est.setInputCloud(fpfhs_src);
 	est.setInputTarget(fpfhs_tgt);
+	est.getSearchMethodSource()->setNumCores(0);
+	est.getSearchMethodTarget()->setNumCores(0);
 	est.determineReciprocalCorrespondences(all_correspondences);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void
 rejectBadCorrespondences(const CorrespondencesPtr &all_correspondences,
-	const PointCloud<PointXYZ>::Ptr &keypoints_src,
-	const PointCloud<PointXYZ>::Ptr &keypoints_tgt,
+	const PointCloud<PointXYZI>::Ptr &keypoints_src,
+	const PointCloud<PointXYZI>::Ptr &keypoints_tgt,
 	Correspondences &remaining_correspondences)
 {
 	CorrespondenceRejectorDistance rej;
-	rej.setInputCloud<PointXYZ>(keypoints_src);
-	rej.setInputTarget<PointXYZ>(keypoints_tgt);
+	rej.setInputCloud<PointXYZI>(keypoints_src);
+	rej.setInputTarget<PointXYZI>(keypoints_tgt);
 	rej.setMaximumDistance(1);    // 1m
 	rej.setInputCorrespondences(all_correspondences);
 	rej.getCorrespondences(remaining_correspondences);
@@ -144,8 +151,8 @@ void computeTransformation(const PointCloud<PointXYZ>::Ptr &src,
 	Eigen::Matrix4f &transform)
 {
 	// Get an uniform grid of keypoints
-	PointCloud<PointXYZ>::Ptr keypoints_src(new PointCloud<PointXYZ>),
-		keypoints_tgt(new PointCloud<PointXYZ>);
+	PointCloud<PointXYZI>::Ptr keypoints_src(new PointCloud<PointXYZI>),
+		keypoints_tgt(new PointCloud<PointXYZI>);
 
 	estimateKeypoints(src, tgt, *keypoints_src, *keypoints_tgt);
 	print_info("Found %lu and %lu keypoints for the source and target datasets.\n", keypoints_src->points.size(), keypoints_tgt->points.size());
@@ -163,9 +170,9 @@ void computeTransformation(const PointCloud<PointXYZ>::Ptr &src,
 
 	// Copy the data and save it to disk
   /*  PointCloud<PointNormal> s, t;
-	copyPointCloud<PointXYZ, PointNormal> (*keypoints_src, s);
+	copyPointCloud<PointXYZI, PointNormal> (*keypoints_src, s);
 	copyPointCloud<Normal, PointNormal> (normals_src, s);
-	copyPointCloud<PointXYZ, PointNormal> (*keypoints_tgt, t);
+	copyPointCloud<PointXYZI, PointNormal> (*keypoints_tgt, t);
 	copyPointCloud<Normal, PointNormal> (normals_tgt, t);*/
 
 	// Find correspondences between keypoints in FPFH space
@@ -179,7 +186,7 @@ void computeTransformation(const PointCloud<PointXYZ>::Ptr &src,
 	for (int i = 0; i < good_correspondences->size(); ++i)
 		std::cerr << good_correspondences->at(i) << std::endl;
 	// Obtain the best transformation between the two sets of keypoints given the remaining correspondences
-	TransformationEstimationSVD<PointXYZ, PointXYZ> trans_est;
+	TransformationEstimationSVD<PointXYZI, PointXYZI> trans_est;
 	trans_est.estimateRigidTransformation(*keypoints_src, *keypoints_tgt, *good_correspondences, transform);
 }
 

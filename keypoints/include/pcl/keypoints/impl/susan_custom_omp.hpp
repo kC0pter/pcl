@@ -426,9 +426,9 @@ pcl::SUSANKeypointCustomOMP<PointInT, PointOutT, NormalT, IntensityT>::detectKey
     output.points.clear ();
     output.points.reserve (response->points.size());
     
-//#ifdef _OPENMP
-//#pragma omp parallel for shared (output) num_threads(threads_)   
-//#endif
+#ifdef _OPENMP
+#pragma omp parallel for shared (output) num_threads(threads_)   
+#endif
     for (int idx = 0; idx < static_cast<int> (response->points.size ()); ++idx)
     {
       const PointOutT& point_in = response->points [idx];
@@ -451,9 +451,9 @@ pcl::SUSANKeypointCustomOMP<PointInT, PointOutT, NormalT, IntensityT>::detectKey
         }
       }
       if (is_minima)
-//#ifdef _OPENMP
-//#pragma omp critical
-//#endif
+#ifdef _OPENMP
+#pragma omp critical
+#endif
       {
         output.points.push_back (response->points[idx]);
         keypoints_indices_->indices.push_back (idx);

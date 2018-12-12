@@ -1,0 +1,56 @@
+#include <pcl/console/parse.h>
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+
+#include <pcl/io/pcd_io.h>
+#include <pcl/keypoints/harris_2d.h>
+#include <pcl/features/normal_3d_omp.h>
+
+using namespace std;
+using namespace pcl;
+using namespace pcl::io;
+using namespace pcl::console;
+
+////////////////////////////////////////////////////////////////////////////////
+void estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
+	PointCloud<PointXYZI> &keypoints_src)
+{
+	HarrisKeypoint2D<PointXYZ, PointXYZI> keypoints_est;
+
+	keypoints_est.setInputCloud(src);
+	keypoints_est.setRadiusSearch(1);
+	keypoints_est.compute(keypoints_src);
+}
+
+/* ---[ */
+int main(int argc, char** argv)
+{
+	PointCloud<PointXYZ>::Ptr src;
+	PointCloud<PointXYZI>::Ptr keypoints_src(new PointCloud<PointXYZI>);
+	std::vector<int> p_file_indices;
+
+	// Parse the command line arguments for .pcd files
+	p_file_indices = parse_file_extension_argument(argc, argv, ".pcd");
+	if (p_file_indices.size() != 1)
+	{
+		print_error("Need one input PCD file to continue.\n");
+		print_error("Example: %s source.pcd\n", argv[0]);
+		return (-1);
+	}
+
+	// Load the files
+	print_info("Loading %s as source ...\n", argv[p_file_indices[0]]);
+	src.reset(new PointCloud<PointXYZ>);
+	if (loadPCDFile(argv[p_file_indices[0]], *src) == -1)
+	{
+		print_error("Error reading the input file!\n");
+		return (-1);
+	}
+
+	estimateKeypoints(src, *keypoints_src);
+	print_info("Found %lu keypoints for the source dataset.\n", keypoints_src->points.size());
+
+	// Write it to disk
+	savePCDFileBinary("keypoints_src.pcd", *keypoints_src);
+}
+/* ]--- */

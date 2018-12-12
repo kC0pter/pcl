@@ -173,7 +173,7 @@ pcl::HarrisKeypoint6DCustom<PointInT, PointOutT, NormalT>::detectKeypoints (Poin
 #ifdef _OPENMP
   #pragma omp parallel for num_threads(threads_) default(shared)
 #endif  
-  for (unsigned idx = 0; idx < surface_->size (); ++idx)
+  for (long idx = 0; idx < surface_->size (); ++idx)
   {
     cloud->points [idx].x = surface_->points [idx].x;
     cloud->points [idx].y = surface_->points [idx].y;
@@ -193,7 +193,7 @@ pcl::HarrisKeypoint6DCustom<PointInT, PointOutT, NormalT>::detectKeypoints (Poin
 #ifdef _OPENMP
   #pragma omp parallel for num_threads(threads_) default (shared)
 #endif    
-  for (unsigned idx = 0; idx < intensity_gradients_->size (); ++idx)
+  for (long idx = 0; idx < intensity_gradients_->size (); ++idx)
   {
     float len = intensity_gradients_->points [idx].gradient_x * intensity_gradients_->points [idx].gradient_x +
                 intensity_gradients_->points [idx].gradient_y * intensity_gradients_->points [idx].gradient_y +
@@ -236,7 +236,7 @@ pcl::HarrisKeypoint6DCustom<PointInT, PointOutT, NormalT>::detectKeypoints (Poin
 #ifdef _OPENMP
   #pragma omp parallel for num_threads(threads_) default(shared)
 #endif  
-    for (size_t idx = 0; idx < response->points.size (); ++idx)
+    for (long long idx = 0; idx < response->points.size (); ++idx)
     {
       if (!isFinite (response->points[idx]) || response->points[idx].intensity < threshold_)
         continue;
@@ -284,7 +284,7 @@ pcl::HarrisKeypoint6DCustom<PointInT, PointOutT, NormalT>::responseTomasi (Point
 #ifdef _OPENMP
   #pragma omp parallel for default (shared) private (pointOut, covar, covariance, solver) num_threads(threads_)
 #endif  
-  for (unsigned pIdx = 0; pIdx < input_->size (); ++pIdx)
+  for (long pIdx = 0; pIdx < input_->size (); ++pIdx)
   {
     const PointInT& pointIn = input_->points [pIdx];
     pointOut.intensity = 0.0; //std::numeric_limits<float>::quiet_NaN ();

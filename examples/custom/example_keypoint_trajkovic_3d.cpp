@@ -13,7 +13,6 @@ using namespace pcl::console;
 
 ////////////////////////////////////////////////////////////////////////////////
 void estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
-	const PointCloud<Normal>::Ptr &normals_src,
 	PointCloud<PointXYZI> &keypoints_src)
 {
 	TrajkovicKeypoint3D<PointXYZ, PointXYZI> keypoints_est;
@@ -25,22 +24,11 @@ void estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
 	keypoints_est.compute(keypoints_src);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-void estimateNormals(const PointCloud<PointXYZ>::Ptr &src,
-	PointCloud<Normal> &normals_src)
-{
-	NormalEstimationOMP<PointXYZ, Normal> normal_est;
-	normal_est.setInputCloud(src);
-	normal_est.setRadiusSearch(0.5);  // 50cm
-	normal_est.compute(normals_src);
-}
-
 /* ---[ */
 int main(int argc, char** argv)
 {
 	PointCloud<PointXYZ>::Ptr src;
 	PointCloud<PointXYZI>::Ptr keypoints_src(new PointCloud<PointXYZI>);
-	PointCloud<Normal>::Ptr normals_src(new PointCloud<Normal>);
 	std::vector<int> p_file_indices;
 
 	// Parse the command line arguments for .pcd files
@@ -61,14 +49,10 @@ int main(int argc, char** argv)
 		return (-1);
 	}
 
-	estimateNormals(src, *normals_src);
-	print_info("Estimated %lu normals for the source dataset.\n", normals_src->points.size());
-
-	estimateKeypoints(src, normals_src, *keypoints_src);
+	estimateKeypoints(src, *keypoints_src);
 	print_info("Found %lu keypoints for the source dataset.\n", keypoints_src->points.size());
 
 	// Write it to disk
-	savePCDFileBinary("src_normals", *normals_src);
 	savePCDFileBinary("keypoints_src.pcd", *keypoints_src);
 }
 /* ]--- */

@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 	// Write it to disk
 	tStart = clock();
 	savePCDFileBinary("trajkovic2d_keypoints_src.pcd", *keypoints_src);
-	print_info("Saved keypoints to file.\n", keypoints_src->points.size());
+	print_info("Saved %lu keypoints to file.\n", keypoints_src->points.size());
 	print_info("CPU Time taken: %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 }
 /* ]--- */

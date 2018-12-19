@@ -6,6 +6,8 @@
 #include <pcl/keypoints/trajkovic_3d.h>
 #include <pcl/features/normal_3d_omp.h>
 
+#include <time.h>
+
 using namespace std;
 using namespace pcl;
 using namespace pcl::io;
@@ -31,6 +33,8 @@ int main(int argc, char** argv)
 	PointCloud<PointXYZI>::Ptr keypoints_src(new PointCloud<PointXYZI>);
 	std::vector<int> p_file_indices;
 
+	clock_t tStart; // Variable for time measurement
+
 	// Parse the command line arguments for .pcd files
 	p_file_indices = parse_file_extension_argument(argc, argv, ".pcd");
 	if (p_file_indices.size() != 1)
@@ -49,7 +53,9 @@ int main(int argc, char** argv)
 		return (-1);
 	}
 
+	tStart = clock();
 	estimateKeypoints(src, *keypoints_src);
+	print_info("CPU Time taken: %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 	print_info("Found %lu keypoints for the source dataset.\n", keypoints_src->points.size());
 
 	// Write it to disk

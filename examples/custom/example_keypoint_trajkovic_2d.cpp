@@ -6,6 +6,8 @@
 #include <pcl/keypoints/trajkovic_2d.h>
 #include <pcl/features/normal_3d_omp.h>
 
+#include <time.h>
+
 using namespace std;
 using namespace pcl;
 using namespace pcl::io;
@@ -30,6 +32,8 @@ int main(int argc, char** argv)
 	PointCloud<PointXYZI>::Ptr src;
 	PointCloud<PointXYZI>::Ptr keypoints_src(new PointCloud<PointXYZI>);
 	std::vector<int> p_file_indices;
+
+	clock_t tStart;
 
 	// Parse the command line arguments for .pcd files
 	p_file_indices = parse_file_extension_argument(argc, argv, ".pcd");

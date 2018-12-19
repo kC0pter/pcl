@@ -33,6 +33,7 @@ int main(int argc, char** argv)
 
 	clock_t tStart; // Variable for time measurement
 
+	print_info("Trajkovic3D Example");
 	// Parse the command line arguments for .pcd files
 	p_file_indices = parse_file_extension_argument(argc, argv, ".pcd");
 	if (p_file_indices.size() != 1)

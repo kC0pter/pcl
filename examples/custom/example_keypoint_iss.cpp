@@ -6,6 +6,8 @@
 #include <pcl/keypoints/iss_3d.h>
 #include <pcl/features/normal_3d_omp.h>
 
+#include <time.h>
+
 using namespace std;
 using namespace pcl;
 using namespace pcl::io;
@@ -47,13 +49,12 @@ double computeCloudResolution(const pcl::PointCloud<PointXYZRGBA>::ConstPtr &clo
 ////////////////////////////////////////////////////////////////////////////////
 void estimateKeypoints(const PointCloud<PointXYZRGBA>::Ptr &src,
 	const PointCloud<Normal>::Ptr &normals_src,
-	PointCloud<PointXYZRGBA> &keypoints_src)
+	PointCloud<PointXYZRGBA> &keypoints_src,
+	double model_resolution)
 {
 	ISSKeypoint3D<PointXYZRGBA, PointXYZRGBA> keypoints_est;
 
 	keypoints_est.setRadiusSearch(1);
-
-	double model_resolution = computeCloudResolution(src);
 
 	//iss_detector.setSearchMethod(tree);
 	keypoints_est.setSalientRadius(6 * model_resolution);
@@ -80,10 +81,15 @@ void estimateNormals(const PointCloud<PointXYZRGBA>::Ptr &src,
 /* ---[ */
 int main(int argc, char** argv)
 {
-	PointCloud<PointXYZRGBA>::Ptr src;
+	PointCloud<PointXYZRGBA>::Ptr src(new PointCloud<PointXYZRGBA>);
 	PointCloud<PointXYZRGBA>::Ptr keypoints_src(new PointCloud<PointXYZRGBA>);
 	PointCloud<Normal>::Ptr normals_src(new PointCloud<Normal>);
 	std::vector<int> p_file_indices;
+	double model_resolution;
+
+	clock_t tStart;
+
+	print_info("ISS Example");
 
 	// Parse the command line arguments for .pcd files
 	p_file_indices = parse_file_extension_argument(argc, argv, ".pcd");
@@ -96,21 +102,40 @@ int main(int argc, char** argv)
 
 	// Load the files
 	print_info("Loading %s as source ...\n", argv[p_file_indices[0]]);
-	src.reset(new PointCloud<PointXYZRGBA>);
+	tStart = clock();
 	if (loadPCDFile(argv[p_file_indices[0]], *src) == -1)
 	{
 		print_error("Error reading the input file!\n");
 		return (-1);
 	}
 
+	print_info("Loaded %lu points as the source dataset.\n", src->size());
+	print_info("CPU Time taken: %.2fs\n\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+
+	tStart = clock();
+	model_resolution = computeCloudResolution(src);
+	print_info("Calculated the model resolution for the source dataset.\n");
+	print_info("CPU Time taken: %.2fs\n\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+
+	tStart = clock();
 	estimateNormals(src, *normals_src);
 	print_info("Estimated %lu normals for the source dataset.\n", normals_src->points.size());
+	print_info("CPU Time taken: %.2fs\n\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
+	tStart = clock();
 	estimateKeypoints(src, normals_src, *keypoints_src);
 	print_info("Found %lu keypoints for the source dataset.\n", keypoints_src->points.size());
+	print_info("CPU Time taken: %.2fs\n\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
 	// Write it to disk
-	savePCDFileBinary("src_normals", *normals_src);
-	savePCDFileBinary("keypoints_src.pcd", *keypoints_src);
+	tStart = clock();
+	savePCDFileBinary("iss_src_normals", *normals_src);
+	print_info("Saved %lu normals to file.\n", normals_src->points.size());
+	print_info("CPU Time taken: %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+
+	tStart = clock();
+	savePCDFileBinary("iss_keypoints_src.pcd", *keypoints_src);
+	print_info("Saved %lu keypoints to file.\n", keypoints_src->points.size());
+	print_info("CPU Time taken: %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 }
 /* ]--- */

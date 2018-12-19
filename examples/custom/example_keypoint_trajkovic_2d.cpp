@@ -33,6 +33,8 @@ int main(int argc, char** argv)
 
 	clock_t tStart;
 
+	print_info("Trajkovic2D Example");
+
 	// Parse the command line arguments for .pcd files
 	p_file_indices = parse_file_extension_argument(argc, argv, ".pcd");
 	if (p_file_indices.size() != 1)

@@ -19,8 +19,6 @@ void estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
 {
 	TrajkovicKeypoint3D<PointXYZ, PointXYZI> keypoints_est;
 
-	keypoints_est.setRadiusSearch(1);
-
 	keypoints_est.setInputCloud(src);
 	keypoints_est.setNumberOfThreads();
 	keypoints_est.compute(keypoints_src);

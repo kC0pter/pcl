@@ -20,8 +20,6 @@ void estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
 {
 	SUSANKeypointCustomOMP<PointXYZ, PointXYZ> keypoints_est;
 
-	keypoints_est.setRadiusSearch(1);
-
 	keypoints_est.setInputCloud(src);
 	keypoints_est.setNormals(normals_src);
 	keypoints_est.compute(keypoints_src);

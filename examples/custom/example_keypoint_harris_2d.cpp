@@ -6,6 +6,8 @@
 #include <pcl/keypoints/harris_2d.h>
 #include <pcl/features/normal_3d_omp.h>
 
+#include <time.h>
+
 using namespace std;
 using namespace pcl;
 using namespace pcl::io;
@@ -25,9 +27,13 @@ void estimateKeypoints(const PointCloud<PointXYZ>::Ptr &src,
 /* ---[ */
 int main(int argc, char** argv)
 {
-	PointCloud<PointXYZ>::Ptr src;
+	PointCloud<PointXYZ>::Ptr src(new PointCloud<PointXYZ>);
 	PointCloud<PointXYZI>::Ptr keypoints_src(new PointCloud<PointXYZI>);
 	std::vector<int> p_file_indices;
+
+	clock_t tStart;
+
+	print_info("Harris2D example");
 
 	// Parse the command line arguments for .pcd files
 	p_file_indices = parse_file_extension_argument(argc, argv, ".pcd");
@@ -40,17 +46,25 @@ int main(int argc, char** argv)
 
 	// Load the files
 	print_info("Loading %s as source ...\n", argv[p_file_indices[0]]);
-	src.reset(new PointCloud<PointXYZ>);
+	tStart = clock();
 	if (loadPCDFile(argv[p_file_indices[0]], *src) == -1)
 	{
 		print_error("Error reading the input file!\n");
 		return (-1);
 	}
 
+	print_info("Loaded %lu points as the source dataset.\n", src->size());
+	print_info("CPU Time taken: %.2fs\n\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+
+	tStart = clock();
 	estimateKeypoints(src, *keypoints_src);
 	print_info("Found %lu keypoints for the source dataset.\n", keypoints_src->points.size());
+	print_info("CPU Time taken: %.2fs\n\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
 	// Write it to disk
-	savePCDFileBinary("keypoints_src.pcd", *keypoints_src);
+	tStart = clock();
+	savePCDFileBinary("harris2d_keypoints_src.pcd", *keypoints_src);
+	print_info("Saved %lu keypoints to file.\n", keypoints_src->points.size());
+	print_info("CPU Time taken: %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 }
 /* ]--- */

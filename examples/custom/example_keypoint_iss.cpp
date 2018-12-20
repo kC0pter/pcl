@@ -123,7 +123,7 @@ int main(int argc, char** argv)
 	print_info("CPU Time taken: %.2fs\n\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
 	tStart = clock();
-	estimateKeypoints(src, normals_src, *keypoints_src);
+	estimateKeypoints(src, normals_src, *keypoints_src, model_resolution);
 	print_info("Found %lu keypoints for the source dataset.\n", keypoints_src->points.size());
 	print_info("CPU Time taken: %.2fs\n\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 

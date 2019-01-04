@@ -36,3 +36,6 @@ PCL_ADD_EXAMPLE(pcl_example_custom_feature_fpfh FILES example_feature_fpfh.cpp
 				
 PCL_ADD_EXAMPLE(pcl_example_custom_feature_normal FILES example_feature_normal.cpp
                 LINK_WITH pcl_common pcl_search pcl_features pcl_io)
+			
+PCL_ADD_EXAMPLE(pcl_example_custom_pcd_to_pcd_binary FILES example_pcd_io.cpp
+                LINK_WITH pcl_common pcl_io)
